@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: brokenapp  
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crashloop-demo
+  template:
+    metadata:
+      labels:
+        app: crashloop-demo
+    spec:
+      containers:
+      - name: crashloop-app
+        image: busybox:latest
+        command: ["sh", "-c"]
+        args:
+          - |
+            if [ -z "$DBHOST" ]; then
+              echo "ERROR: DBHOST not set"
+              exit 1
+            else
+              echo "DBHOST is $DBHOST"
+              sleep 3600
+            fi
+        env:
+        - name: DBHOST
+          value: ""   # Intentionally broken

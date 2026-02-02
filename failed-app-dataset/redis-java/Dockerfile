@@ -7,7 +7,7 @@ COPY src ./src
 RUN mvn clean package
 
 # Stage 2: Create the final, smaller runtime image
-FROM openjdk:11-jre-slim
+FROM openjdk:11.0.11-jre-slim-buster
 WORKDIR /app
 # Copy the executable JAR from the build stage
 COPY --from=build /app/target/redis-pinger-1.0-SNAPSHOT-jar-with-dependencies.jar ./redis-pinger.jar

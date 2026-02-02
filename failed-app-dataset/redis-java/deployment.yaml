@@ -17,6 +17,7 @@ spec:
       containers:
       - name: redis-pinger
         image: jpgouin/redis-pinger:arm64
+        pullPolicy: Always
         env:
           # These environment variables configure the Redis connection.
           # We assume a Redis service is running in the cluster with the name 'redis-service'.

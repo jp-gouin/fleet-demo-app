@@ -1,9 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: redis-deployment
-  labels:
-    app: redis
+  name: redis
+  namespace: redis
 spec:
   replicas: 1
   selector:
@@ -16,6 +15,6 @@ spec:
     spec:
       containers:
       - name: redis
-        image: jpgouin/redis:7.2-alpine
+        image: dp.apps.rancher.io/containers/redis:8.6.2-3.5
         ports:
         - containerPort: 6379

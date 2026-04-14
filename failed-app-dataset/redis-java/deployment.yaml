@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: redis-pinger
-        image: jpgouin/redis-pinger:amd64
+        image: jpgouin/redis-pinger:arm64
         ports:
         - containerPort: 8080

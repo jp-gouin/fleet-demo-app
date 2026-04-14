@@ -16,15 +16,6 @@ spec:
     spec:
       containers:
       - name: redis-pinger
-        image: jpgouin/redis-pinger:arm64
-        pullPolicy: Always
-        env:
-          # These environment variables configure the Redis connection.
-          # We assume a Redis service is running in the cluster with the name 'redis-service'.
-          - name: REDIS_HOST
-            value: "redis-service"
-          - name: REDIS_PORT
-            value: "6397"
-      # The default restart policy is "Always", which means Kubernetes will
-      # automatically restart the container if it exits with an error (crashes).
-      restartPolicy: Always
+        image: jpgouin/redis-pinger:amd64
+        ports:
+        - containerPort: 8080

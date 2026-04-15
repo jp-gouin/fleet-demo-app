@@ -16,6 +16,11 @@ spec:
     spec:
       containers:
       - name: redis-pinger
-        image: jpgouin/redis-pinger:arm64
+        image: jpgouin/redis-pinger:amd64
         ports:
         - containerPort: 8080
+        env:
+        - name: REDIS_HOST
+          value: redis-service
+        - name: REDIS_PORT
+          value: "6379"

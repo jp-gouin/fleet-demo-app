@@ -5,7 +5,7 @@ metadata:
   labels:
     app: redis-pinger
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: redis-pinger
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: redis-pinger
-        image: jpgouin/redis-pinger:arm64
+        image: docker.io/jpgouin/redis-pinger:amd64
         ports:
         - containerPort: 8080

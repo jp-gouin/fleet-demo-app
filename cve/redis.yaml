@@ -5,7 +5,7 @@ metadata:
   labels:
     app: redis
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: redis
@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: redis
-        image: jpgouin/redis:7.2-alpine
+        image: redis:latest
         ports:
         - containerPort: 6379

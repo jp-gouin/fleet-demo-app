@@ -14,8 +14,10 @@ spec:
       labels:
         app: redis
     spec:
+      imagePullSecrets:
+        - name: application-collection
       containers:
       - name: redis
-        image: jpgouin/redis:7.2-alpine
+        image: dp.apps.rancher.io/containers/redis:7.2.16-24.12
         ports:
         - containerPort: 6379

@@ -1,0 +1,6 @@
+.git
+k8s
+*.md
+fleet-gitrepo.yaml
+.dockerignore
+.gitignore

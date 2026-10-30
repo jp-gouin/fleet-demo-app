@@ -1,0 +1,14 @@
+# Apply this in the Rancher/Fleet management cluster (fleet-default namespace)
+# to register this repo with Fleet. Replace the repo URL and branch.
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: php2shell-demo
+  namespace: fleet-default
+spec:
+  repo: https://github.com/jp-gouin/fleet-demo-app
+  branch: main
+  paths:
+    - cve/php2shell/k8s
+  targets:
+    - clusterSelector: {}

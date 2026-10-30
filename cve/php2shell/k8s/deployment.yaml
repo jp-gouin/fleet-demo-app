@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php2shell-demo
+  labels:
+    app: php2shell-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php2shell-demo
+  template:
+    metadata:
+      labels:
+        app: php2shell-demo
+    spec:
+      containers:
+        - name: web
+          # Rebuild + push after the fix PR (bump the Dockerfile PHP base image).
+          image: ghcr.io/jp-gouin/php2shell-demo:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 128Mi

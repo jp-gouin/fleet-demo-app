@@ -1,0 +1,11 @@
+# Fleet bundle config.
+#
+# Create a GitRepo in Rancher pointing at this repository with path `k8s`, and
+# Fleet will deploy the manifests in this directory to the target cluster(s).
+#
+# The remediation workflow is pure GitOps:
+#   1. This vulnerable build is deployed from the main branch.
+#   2. The fix PR sets PATCHED=true and is merged.
+#   3. Rebuild + push the image; Fleet rolls out the SECURE build automatically.
+namespace: php2shell-demo
+defaultNamespace: php2shell-demo

@@ -17,7 +17,7 @@ spec:
       containers:
         - name: web
           # Rebuild + push after the fix PR (bump the Dockerfile PHP base image).
-          image: ghcr.io/jp-gouin/php2shell-demo:8.3.35
+          image: ghcr.io/jp-gouin/php2shell-demo:8.3.6-vuln
           imagePullPolicy: Always
           ports:
             - containerPort: 80

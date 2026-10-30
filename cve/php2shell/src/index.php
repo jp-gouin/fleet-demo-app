@@ -40,15 +40,16 @@ $secure = !is_vulnerable();
     <p class="lede">
       A live, self-contained lab for <strong>php2shell</strong> — the critical
       unauthenticated remote-code-execution flaw in the PHP runtime itself,
-      patched on 2026-10-21. Security here is decided by the PHP version, not app
-      code. This build runs
-      <strong class="inline-status">PHP <?= htmlspecialchars(PHP_VERSION) ?></strong>,
+      patched on 2026-10-21. Security here is decided by the installed PHP
+      package, not app code. This build ships Ubuntu's
+      <strong class="inline-status">php8.3 <?= htmlspecialchars(php_package_version() ?? PHP_VERSION) ?></strong>,
       so it is currently
       <strong class="inline-status"><?= $secure ? 'secure' : 'vulnerable' ?></strong>.
     </p>
     <div class="deploy-meta">
       <span>host: <?= htmlspecialchars(gethostname() ?: 'unknown') ?></span>
       <span>php: <?= htmlspecialchars(PHP_VERSION) ?></span>
+      <span>pkg: <?= htmlspecialchars(php_package_version() ?? 'unknown') ?></span>
       <span>build: <?= $secure ? 'remediated' : 'vulnerable' ?></span>
     </div>
   </section>
@@ -102,10 +103,11 @@ shell_exec($command);</pre>
     <article class="card">
       <h3>The fix</h3>
       <pre class="snippet"># Dockerfile
--FROM php:<span class="hl">8.3.35</span>-apache
-+FROM php:<span class="hl">8.3.36</span>-apache</pre>
-      <p class="muted">Bump to the first php2shell-patched 8.3 release. The app
-      detects the fixed runtime and the banner turns green. Open the PR to ship it.</p>
+-ARG PATCH_STATE=<span class="hl">vulnerable</span>
++ARG PATCH_STATE=<span class="hl">fixed</span></pre>
+      <p class="muted">Pull Ubuntu's php2shell security update
+      (8.3.6-0ubuntu0.24.04.13). The app detects the patched package and the
+      banner turns green. Open the PR to ship it.</p>
     </article>
   </section>
 </main>

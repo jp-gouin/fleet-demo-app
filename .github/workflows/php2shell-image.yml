@@ -40,30 +40,35 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Tag the image with the PHP version from the Dockerfile's FROM line, e.g.
-      # `FROM php:8.3.35-apache` -> tag `8.3.35`. No `latest`: the tag tracks the
-      # exact PHP runtime, so the fix PR (bump to 8.3.36) produces a new, distinct
-      # image tag that the Deployment can pin to.
-      - name: Derive PHP version tag
-        id: ver
-        run: |
-          php_ver="$(sed -n 's/^FROM php:\([0-9.]*\).*/\1/p' cve/php2shell/Dockerfile | head -n1)"
-          if [ -z "$php_ver" ]; then
-            echo "Could not parse PHP version from Dockerfile FROM line" >&2
-            exit 1
-          fi
-          echo "php=$php_ver" >> "$GITHUB_OUTPUT"
-          echo "Image tag: ${IMAGE}:$php_ver"
-
-      - name: Build and push
+      # Build locally first so we can read the installed PHP package revision out
+      # of the image and derive the tag from it. Ubuntu reports PHP 8.3.6 for both
+      # the vulnerable and patched builds, so the tag encodes the security state:
+      #   8.3.6-vuln   (GA php8.3)
+      #   8.3.6-fixed  (…24.04.13 php2shell security update)
+      # No `latest`. The fix PR flips PATCH_STATE, which flips the tag, so the
+      # Deployment pins to a distinct image and Fleet rolls out.
+      - name: Build image
         uses: docker/build-push-action@v6
         with:
           context: cve/php2shell
           file: cve/php2shell/Dockerfile
-          # Push on branch builds (merge to main); build-only on PRs.
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: |
-            ${{ env.IMAGE }}:${{ steps.ver.outputs.php }}
-            ${{ env.IMAGE }}:${{ steps.ver.outputs.php }}-${{ github.sha }}
+          load: true
+          tags: php2shell-demo:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Derive tag from installed PHP package
+        id: tag
+        run: |
+          pkg="$(docker run --rm php2shell-demo:ci cat /etc/php2shell.pkgver)"
+          rev="$(printf '%s' "$pkg" | sed -n 's/.*0ubuntu0\.24\.04\.\([0-9]*\).*/\1/p')"
+          if [ -n "$rev" ] && [ "$rev" -ge 13 ]; then state=fixed; else state=vuln; fi
+          echo "pkg=$pkg"   >> "$GITHUB_OUTPUT"
+          echo "tag=8.3.6-$state" >> "$GITHUB_OUTPUT"
+          echo "Installed php8.3 package: $pkg -> ${IMAGE}:8.3.6-$state"
+
+      - name: Push image
+        if: github.event_name != 'pull_request'
+        run: |
+          docker tag php2shell-demo:ci "${IMAGE}:${{ steps.tag.outputs.tag }}"
+          docker push "${IMAGE}:${{ steps.tag.outputs.tag }}"

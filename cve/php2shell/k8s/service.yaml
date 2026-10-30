@@ -5,7 +5,7 @@ metadata:
   labels:
     app: php2shell-demo
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: php2shell-demo
   ports:

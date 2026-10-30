@@ -1,7 +1,9 @@
+# php2shell-demo — vulnerable PHP app for CVE-2026-109618 / CVE-2026-109619 training.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: php2shell-demo
+  namespace: php2shell-demo
   labels:
     app: php2shell-demo
 spec:
@@ -17,20 +19,7 @@ spec:
       containers:
         - name: web
           # Rebuild + push after the fix PR (bump the Dockerfile PHP base image).
-          image: ghcr.io/jp-gouin/php2shell-demo:8.3.6-vuln
+          image: ghcr.io/jp-gouin/php2shell-demo:8.3.36
           imagePullPolicy: Always
           ports:
             - containerPort: 80
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 80
-            initialDelaySeconds: 3
-            periodSeconds: 10
-          resources:
-            requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 250m
-              memory: 128Mi

@@ -1,5 +1,5 @@
 # PHP 8.0 on Apache — security training demo (CVE-2024-DEMO / CWE-78).
-FROM php:8.0-apache
+FROM php:8.3.36-apache
 
 # `ping` is needed by the diagnostics demo endpoint.
 # Bullseye is EOL; its security pocket index can get ahead of the pool and 404.

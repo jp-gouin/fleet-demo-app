@@ -35,12 +35,13 @@ $secure = !is_vulnerable();
 
 <main>
   <section class="hero">
-    <p class="kicker">CVE-2024-DEMO · CWE-78 · OS Command Injection</p>
-    <h1>From input box<span class="arrow"> → </span><span class="glitch" data-text="shell">shell</span></h1>
+    <p class="kicker">CVE-2026-109618 · CVE-2026-109619 · php2shell · PHP RCE</p>
+    <h1>php2<span class="glitch" data-text="shell">shell</span></h1>
     <p class="lede">
-      A live, self-contained lab showing how one line of unsafe PHP turns a
-      harmless network tool into remote command execution — and how upgrading
-      the runtime shuts it down. This build runs
+      A live, self-contained lab for <strong>php2shell</strong> — the critical
+      unauthenticated remote-code-execution flaw in the PHP runtime itself,
+      patched on 2026-10-21. Security here is decided by the PHP version, not app
+      code. This build runs
       <strong class="inline-status">PHP <?= htmlspecialchars(PHP_VERSION) ?></strong>,
       so it is currently
       <strong class="inline-status"><?= $secure ? 'secure' : 'vulnerable' ?></strong>.
@@ -101,10 +102,10 @@ shell_exec($command);</pre>
     <article class="card">
       <h3>The fix</h3>
       <pre class="snippet"># Dockerfile
--FROM php:<span class="hl">8.0</span>-apache
-+FROM php:<span class="hl">8.3</span>-apache</pre>
-      <p class="muted">The app detects the runtime: off PHP&nbsp;8.0 it switches to
-      the validated + <code>escapeshellarg()</code> path. Open the PR to ship it.</p>
+-FROM php:<span class="hl">8.3.35</span>-apache
++FROM php:<span class="hl">8.3.36</span>-apache</pre>
+      <p class="muted">Bump to the first php2shell-patched 8.3 release. The app
+      detects the fixed runtime and the banner turns green. Open the PR to ship it.</p>
     </article>
   </section>
 </main>

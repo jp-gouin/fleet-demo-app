@@ -40,14 +40,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Docker metadata (tags)
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,format=short
+      # Tag the image with the PHP version from the Dockerfile's FROM line, e.g.
+      # `FROM php:8.3.35-apache` -> tag `8.3.35`. No `latest`: the tag tracks the
+      # exact PHP runtime, so the fix PR (bump to 8.3.36) produces a new, distinct
+      # image tag that the Deployment can pin to.
+      - name: Derive PHP version tag
+        id: ver
+        run: |
+          php_ver="$(sed -n 's/^FROM php:\([0-9.]*\).*/\1/p' cve/php2shell/Dockerfile | head -n1)"
+          if [ -z "$php_ver" ]; then
+            echo "Could not parse PHP version from Dockerfile FROM line" >&2
+            exit 1
+          fi
+          echo "php=$php_ver" >> "$GITHUB_OUTPUT"
+          echo "Image tag: ${IMAGE}:$php_ver"
 
       - name: Build and push
         uses: docker/build-push-action@v6
@@ -56,7 +62,8 @@ jobs:
           file: cve/php2shell/Dockerfile
           # Push on branch builds (merge to main); build-only on PRs.
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.ver.outputs.php }}
+            ${{ env.IMAGE }}:${{ steps.ver.outputs.php }}-${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

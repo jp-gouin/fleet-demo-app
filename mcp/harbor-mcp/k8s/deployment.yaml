@@ -17,6 +17,9 @@ spec:
     spec:
       securityContext:
         runAsNonRoot: true
+        # distroless "nonroot"; must be numeric for runAsNonRoot to verify it.
+        runAsUser: 65532
+        runAsGroup: 65532
         seccompProfile:
           type: RuntimeDefault
       containers:

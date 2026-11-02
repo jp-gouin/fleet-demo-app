@@ -18,8 +18,7 @@ spec:
     spec:
       containers:
         - name: web
-          # Served from the lab Harbor. The fix PR moves this to :8.3.6-fixed.
-          image: harbor.10.144.103.243.sslip.io/demo/php2shell-demo:8.3.6-vuln
+          image: harbor.10.144.103.243.sslip.io/demo/php2shell-demo:8.3.6
           imagePullPolicy: Always
           ports:
             - containerPort: 80

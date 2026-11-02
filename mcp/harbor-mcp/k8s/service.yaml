@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: harbor-mcp
+  namespace: harbor-mcp
+  labels:
+    app: harbor-mcp
+spec:
+  type: ClusterIP
+  selector:
+    app: harbor-mcp
+  ports:
+    - name: http
+      port: 80
+      targetPort: http

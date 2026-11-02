@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: harbor-mcp
+  namespace: harbor-mcp
+  labels:
+    app: harbor-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: harbor-mcp
+  template:
+    metadata:
+      labels:
+        app: harbor-mcp
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mcp
+          image: ghcr.io/jp-gouin/harbor-mcp-server:7809235
+          # The server is configured by flags only; secret values are injected
+          # via $(VAR) expansion from the harbor-mcp Secret.
+          args:
+            - --host=0.0.0.0
+            - --port=8080
+            - --private-registry-url=http://harbor-core.harbor.svc.cluster.local
+            - --private-registry-username=admin
+            - --private-registry-password=$(HARBOR_PASSWORD)
+            - --mcp-auth-token=$(MCP_AUTH_TOKEN)
+          env:
+            - name: HARBOR_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-mcp
+                  key: HARBOR_PASSWORD
+            - name: MCP_AUTH_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: harbor-mcp
+                  key: MCP_AUTH_TOKEN
+          ports:
+            - name: http
+              containerPort: 8080
+          # /mpc-spr needs an MCP session, so probe the TCP socket instead.
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 20
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi

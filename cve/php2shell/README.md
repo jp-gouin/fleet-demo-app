@@ -46,23 +46,28 @@ docker run --rm -p 8080:80 php2shell-demo:8.3.6-vuln
 
 ## Deploy with Fleet (Rancher GitOps)
 
-1. CI builds the image, reads the installed php8.3 revision, and pushes it to
-   `ghcr.io/<owner>/php2shell-demo` tagged by security state — `:8.3.6-vuln` or
-   `:8.3.6-fixed` (no `latest`). The tag in
-   [`k8s/deployment.yaml`](k8s/deployment.yaml) matches.
-2. Register it with Fleet — apply [`fleet-gitrepo.yaml`](fleet-gitrepo.yaml) (or
-   create the GitRepo in the Rancher UI) pointing at this repo, path
-   `cve/php2shell/k8s`.
-3. Fleet deploys the `php2shell-demo` Deployment + Service.
+1. The images live in the lab Harbor, project `demo` (public):
+   - `harbor.10.144.103.243.sslip.io/demo/php2shell-demo:8.3.6-vuln`
+   - `harbor.10.144.103.243.sslip.io/demo/php2shell-demo:8.3.6-fixed`
+
+   Harbor scans both on push: `8.3.6-vuln` carries CVE-2026-109618/109619
+   (10 Critical), `8.3.6-fixed` has none.
+2. The cluster pulling them must trust Harbor's self-signed CA (RKE2
+   `registries.yaml` -> `configs.<host>.tls.ca_file`).
+3. Fleet (`fleet-local/php2shell-demo`, path `cve/php2shell/k8s`) deploys the
+   Deployment + Service; the tag in [`k8s/deployment.yaml`](k8s/deployment.yaml)
+   picks the build.
 
 ## Fixing the CVE (the PR)
 
-1. Branch, then in the `Dockerfile` flip `ARG PATCH_STATE=vulnerable` →
-   `ARG PATCH_STATE=fixed`, and in `k8s/deployment.yaml` change the image tag
-   `:8.3.6-vuln` → `:8.3.6-fixed`.
-2. CI builds the `:8.3.6-fixed` image on the PR, and pushes it on merge.
-3. Because the Deployment tag changed, Fleet rolls out the new build. The app
+1. Branch, then in `k8s/deployment.yaml` change the image tag
+   `:8.3.6-vuln` -> `:8.3.6-fixed` (already in Harbor). For a matching source
+   change, also flip `ARG PATCH_STATE=vulnerable` -> `fixed` in the `Dockerfile`.
+2. Merge. Fleet sees the manifest change and rolls out the fixed image; the app
    reads the patched php8.3 revision and the banner turns **SECURE**.
+
+GitHub-hosted CI cannot reach the lab Harbor, so it still publishes to GHCR;
+images reach Harbor via `crane copy` / `crane push` from inside the lab.
 
 ## Layout
 

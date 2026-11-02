@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
         - name: web
-          # Rebuild + push after the fix PR (bump the Dockerfile PHP base image).
-          image: ghcr.io/jp-gouin/php2shell-demo:8.3.6-vuln
+          # Served from the lab Harbor. The fix PR moves this to :8.3.6-fixed.
+          image: harbor.10.144.103.243.sslip.io/demo/php2shell-demo:8.3.6-vuln
           imagePullPolicy: Always
           ports:
             - containerPort: 80

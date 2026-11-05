@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: harbor.10.144.103.243.sslip.io/demo/php2shell-demo:8.3.6.13
+          image: harbor.10.144.103.243.sslip.io/demo/php2shell-demo:8.3.6-fixed
           imagePullPolicy: Always
           ports:
             - containerPort: 80
